@@ -5,6 +5,8 @@ import {
   updatePassword,
   type UpdatePasswordState,
 } from "@/app/(auth)/update-password/actions";
+import { Field, TextInput } from "@/components/ui/form-field";
+import { Button } from "@/components/ui/button";
 
 export function UpdatePasswordForm() {
   const [state, formAction, pending] = useActionState<
@@ -14,37 +16,26 @@ export function UpdatePasswordForm() {
 
   return (
     <form action={formAction} className="space-y-5">
-      <div className="space-y-1.5">
-        <label htmlFor="password" className="text-sm font-medium text-slate-700">
-          New password
-        </label>
-        <input
+      <Field label="New password" htmlFor="password">
+        <TextInput
           id="password"
           name="password"
           type="password"
           autoComplete="new-password"
           required
           minLength={8}
-          className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
         />
-      </div>
-      <div className="space-y-1.5">
-        <label
-          htmlFor="confirmPassword"
-          className="text-sm font-medium text-slate-700"
-        >
-          Confirm password
-        </label>
-        <input
+      </Field>
+      <Field label="Confirm password" htmlFor="confirmPassword">
+        <TextInput
           id="confirmPassword"
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
           required
           minLength={8}
-          className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
         />
-      </div>
+      </Field>
 
       {state?.error && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -52,13 +43,9 @@ export function UpdatePasswordForm() {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Updating…" : "Update password"}
-      </button>
+      </Button>
     </form>
   );
 }

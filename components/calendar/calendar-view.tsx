@@ -120,7 +120,7 @@ export function CalendarView({
               className={cn(
                 "rounded-md px-3 py-1.5 text-xs font-medium transition",
                 view === v.mode
-                  ? "bg-slate-900 text-white"
+                  ? "bg-brand-500 text-white"
                   : "text-slate-600 hover:bg-slate-100",
               )}
             >

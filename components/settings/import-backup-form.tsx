@@ -40,7 +40,7 @@ export function ImportBackupForm() {
         type="file"
         accept="application/json"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800"
+        className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-500 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-brand-600"
       />
 
       <label className="flex items-start gap-2 text-sm text-slate-700">

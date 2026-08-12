@@ -82,7 +82,7 @@ export default async function ImportPage({
                   href={`/settings/import?status=${t.key}`}
                   className={cn(
                     "rounded-md px-3 py-1.5 text-xs font-medium transition",
-                    activeTab === t.key ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100",
+                    activeTab === t.key ? "bg-brand-500 text-white" : "text-slate-600 hover:bg-slate-100",
                   )}
                 >
                   {t.label} ({counts[t.key]})

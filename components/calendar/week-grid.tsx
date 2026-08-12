@@ -33,7 +33,7 @@ export function WeekGrid({
               <div
                 className={cn(
                   "flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold",
-                  isToday(day) ? "bg-slate-900 text-white" : "text-slate-700",
+                  isToday(day) ? "bg-brand-500 text-white" : "text-slate-700",
                 )}
               >
                 {format(day, "d")}

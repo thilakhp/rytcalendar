@@ -31,7 +31,7 @@ export function VendorTrainingMatrix({
             key={m}
             href={`/reports?tab=${tab}&metric=${m}`}
             className={`rounded-md px-3 py-1.5 text-xs font-medium capitalize transition ${
-              metric === m ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+              metric === m ? "bg-brand-500 text-white" : "text-slate-600 hover:bg-slate-100"
             }`}
           >
             {m}

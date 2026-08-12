@@ -49,8 +49,8 @@ function MiniMonth({
                 "mx-auto flex h-6 w-6 items-center justify-center rounded-full text-[11px]",
                 !inMonth && "text-slate-200",
                 inMonth && count === 0 && "text-slate-500",
-                inMonth && count > 0 && "bg-slate-900 font-medium text-white",
-                inMonth && isToday(day) && count === 0 && "ring-1 ring-slate-400",
+                inMonth && count > 0 && "bg-brand-500 font-medium text-white",
+                inMonth && isToday(day) && count === 0 && "ring-1 ring-brand-400",
               )}
             >
               {format(day, "d")}

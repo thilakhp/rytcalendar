@@ -7,7 +7,8 @@ export default function AuthLayout({
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mb-1 text-2xl font-semibold tracking-tight text-slate-900">
+          <div className="mb-3 inline-block h-10 w-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-teal-500 shadow-sm" />
+          <div className="text-2xl font-semibold tracking-tight text-slate-900">
             RYT
           </div>
           <div className="text-sm text-slate-500">Training Planner</div>

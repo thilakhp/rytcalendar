@@ -26,7 +26,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition",
               active
-                ? "bg-slate-900 text-white"
+                ? "bg-gradient-to-br from-brand-500 to-brand-teal-500 text-white"
                 : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
             )}
           >
@@ -41,11 +41,14 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function Brand() {
   return (
-    <div className="px-6 py-6">
-      <div className="text-xl font-semibold tracking-tight text-slate-900">
-        RYT
+    <div className="flex items-center gap-2.5 px-6 py-6">
+      <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-brand-teal-500" />
+      <div>
+        <div className="text-xl font-semibold tracking-tight text-slate-900">
+          RYT
+        </div>
+        <div className="text-xs text-slate-500">Training Planner</div>
       </div>
-      <div className="text-xs text-slate-500">Training Planner</div>
     </div>
   );
 }
@@ -93,11 +96,14 @@ export function AppShell({
           />
           <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-white shadow-xl">
             <div className="flex items-center justify-between px-6 py-6">
-              <div>
-                <div className="text-xl font-semibold tracking-tight text-slate-900">
-                  RYT
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-brand-teal-500" />
+                <div>
+                  <div className="text-xl font-semibold tracking-tight text-slate-900">
+                    RYT
+                  </div>
+                  <div className="text-xs text-slate-500">Training Planner</div>
                 </div>
-                <div className="text-xs text-slate-500">Training Planner</div>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
@@ -147,7 +153,7 @@ export function AppShell({
             type="text"
             name="q"
             placeholder="Search programs, vendors, clients…"
-            className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-8 pr-3 text-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+            className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-8 pr-3 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
           />
         </form>
       </header>

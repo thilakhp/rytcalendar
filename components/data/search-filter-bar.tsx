@@ -26,13 +26,13 @@ export function SearchFilterBar({
           name="q"
           defaultValue={q}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-slate-300 py-2.5 pl-9 pr-3.5 text-sm shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+          className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-9 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
         />
       </div>
       <select
         name="status"
         defaultValue={status ?? "active"}
-        className="rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+        className="rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500"
       >
         <option value="active">Active only</option>
         <option value="all">All</option>

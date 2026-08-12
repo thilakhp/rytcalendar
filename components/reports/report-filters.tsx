@@ -100,7 +100,7 @@ export function ReportFilters({
       <div className="col-span-2 flex gap-2 sm:col-span-4 lg:col-span-8">
         <button
           type="submit"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          className="rounded-lg bg-gradient-to-br from-brand-500 to-brand-teal-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-600 hover:to-brand-teal-600"
         >
           Apply Filters
         </button>

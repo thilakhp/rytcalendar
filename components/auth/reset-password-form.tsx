@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import { requestReset, type ResetState } from "@/app/(auth)/reset-password/actions";
+import { Field, TextInput } from "@/components/ui/form-field";
+import { Button } from "@/components/ui/button";
 
 export function ResetPasswordForm() {
   const [state, formAction, pending] = useActionState<ResetState, FormData>(
@@ -20,20 +22,16 @@ export function ResetPasswordForm() {
 
   return (
     <form action={formAction} className="space-y-5">
-      <div className="space-y-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-slate-700">
-          Email
-        </label>
-        <input
+      <Field label="Email" htmlFor="email">
+        <TextInput
           id="email"
           name="email"
           type="email"
           autoComplete="email"
           required
-          className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm shadow-sm outline-none transition focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
           placeholder="you@ryt.com"
         />
-      </div>
+      </Field>
 
       {state?.error && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -41,13 +39,9 @@ export function ResetPasswordForm() {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Sending…" : "Send reset link"}
-      </button>
+      </Button>
 
       <div className="text-center text-sm text-slate-500">
         <a href="/login" className="hover:text-slate-800 hover:underline">

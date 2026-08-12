@@ -1,22 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7f7;
+  --foreground: #1b2232;
+
+  /* RYT Global brand palette (matched from rytglobal.com) */
+  --color-brand-50: #eaf0fc;
+  --color-brand-100: #cddaf7;
+  --color-brand-400: #4a76d8;
+  --color-brand-500: #2d5ed2;
+  --color-brand-600: #244cad;
+  --color-brand-700: #1c3c89;
+  --color-brand-teal-400: #7ad1d1;
+  --color-brand-teal-500: #56c2c2;
+  --color-brand-teal-600: #3ba3a3;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-50: var(--color-brand-50);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-400: var(--color-brand-400);
+  --color-brand-500: var(--color-brand-500);
+  --color-brand-600: var(--color-brand-600);
+  --color-brand-700: var(--color-brand-700);
+  --color-brand-teal-400: var(--color-brand-teal-400);
+  --color-brand-teal-500: var(--color-brand-teal-500);
+  --color-brand-teal-600: var(--color-brand-teal-600);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* This app has no dark-mode design of its own — every component is styled
+   explicitly for a light UI. Without this, mobile browsers in system dark
+   mode apply their own dark-mode text color to unstyled form controls
+   (inputs/selects/textareas), which can render as white text on a white
+   background. Locking color-scheme to light keeps native form-control
+   rendering consistent with the rest of the app. */
+html {
+  color-scheme: light;
 }
 
 body {
