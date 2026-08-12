@@ -130,9 +130,26 @@ function guessDeliveryMode(text: string): string | null {
   return /vilt/i.test(text) ? "VILT" : null;
 }
 
+// Every calendar date strictly between two dates falls on a Saturday or
+// Sunday — i.e. the gap is just a weekend, not a real break in the program.
+function isWeekendOnlyGap(prevDate: Date, nextDate: Date): boolean {
+  const cursor = new Date(prevDate);
+  cursor.setDate(cursor.getDate() + 1);
+  if (cursor.getTime() >= nextDate.getTime()) return true;
+  while (cursor.getTime() < nextDate.getTime()) {
+    const day = cursor.getDay(); // 0 = Sunday, 6 = Saturday
+    if (day !== 0 && day !== 6) return false;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return true;
+}
+
 // Merges consecutive dates that share identical event text into one
 // candidate — this is how the source file represents a multi-day batch (the
-// same text repeated on each day it spans).
+// same text repeated on each day it spans). A gap between two blocks only
+// merges them when every date in between is a weekend day; a gap spanning
+// any weekday is treated as a genuine break unless the text explicitly
+// covers it (e.g. mentions "Sat"/"Sun"), which shows up as its own entry.
 function groupEntries(entries: RawEntry[]): ParsedCandidate[] {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date) || a.sheet.localeCompare(b.sheet));
   const groups: ParsedCandidate[] = [];
@@ -145,7 +162,7 @@ function groupEntries(entries: RawEntry[]): ParsedCandidate[] {
       last.rawText === entry.text &&
       last.sourceSheet === entry.sheet &&
       prevDate &&
-      (new Date(entry.date).getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24) <= 3; // tolerate weekend gaps
+      isWeekendOnlyGap(prevDate, new Date(entry.date));
 
     if (isConsecutive && last) {
       last.endDate = entry.date;

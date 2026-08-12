@@ -7,9 +7,33 @@ import { Field, TextInput, TextArea, Select } from "@/components/ui/form-field";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgramSummary } from "@/components/engagements/program-summary";
-import { calcBatch, type HolidayLite } from "@/lib/calc";
-import type { Client, Vendor, Trainer, TrainingCourse, Engagement, Batch } from "@/lib/types";
+import { calcBatch, addWorkingDaysExcluding, type HolidayLite } from "@/lib/calc";
+import { buildDayMap, dayAvailability } from "@/lib/schedule";
+import type {
+  Client,
+  Vendor,
+  Trainer,
+  TrainingCourse,
+  Engagement,
+  Batch,
+  AvailabilityRule,
+  EngagementStatus,
+} from "@/lib/types";
 import type { EngagementInput } from "@/lib/validation/engagements";
+
+type OtherBatch = { engagement_id: string; start_date: string; end_date: string; status: string };
+
+function minutesToTime(totalMinutes: number): string {
+  const clamped = Math.max(0, Math.min(23 * 60 + 59, Math.round(totalMinutes)));
+  const h = Math.floor(clamped / 60);
+  const m = clamped % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+function timeToMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
 
 type BatchDraft = {
   key: string;
@@ -27,6 +51,8 @@ type BatchDraft = {
   location: string;
   break_minutes: string;
   notes: string;
+  autoTotalDays: string;
+  autoTotalHours: string;
 };
 
 function newBatchKey() {
@@ -52,6 +78,8 @@ function draftFromBatch(b: Batch): BatchDraft {
     location: b.location ?? "",
     break_minutes: String(b.break_minutes ?? 0),
     notes: b.notes ?? "",
+    autoTotalDays: "",
+    autoTotalHours: "",
   };
 }
 
@@ -69,6 +97,8 @@ export function EngagementForm({
   defaultBreakMinutes,
   statuses,
   deliveryModes,
+  otherBatches,
+  availabilityRules,
   onSubmit,
   cancelHref,
 }: {
@@ -85,6 +115,8 @@ export function EngagementForm({
   defaultBreakMinutes: number;
   statuses: string[];
   deliveryModes: string[];
+  otherBatches: OtherBatch[];
+  availabilityRules: Record<EngagementStatus, AvailabilityRule>;
   onSubmit: (input: EngagementInput) => Promise<{ error?: string } | undefined>;
   cancelHref: string;
 }) {
@@ -128,8 +160,41 @@ export function EngagementForm({
         location: "",
         break_minutes: String(defaultBreakMinutes ?? 0),
         notes: "",
+        autoTotalDays: "",
+        autoTotalHours: "",
       },
     ]);
+  }
+
+  // Days already occupied by another engagement's active batches — this
+  // engagement's own batches are excluded so a batch never conflicts with
+  // its siblings or with an earlier version of itself.
+  const blockedDates = new Set(
+    Array.from(
+      buildDayMap(
+        otherBatches.filter((b) => b.engagement_id !== initialEngagement?.id),
+        workingWeekdays,
+        holidays,
+      ).entries(),
+    )
+      .filter(([, dayBatches]) => dayAvailability(dayBatches, availabilityRules) === "occupied")
+      .map(([date]) => date),
+  );
+
+  function autoSchedule(key: string) {
+    const b = batches.find((x) => x.key === key);
+    if (!b || !b.start_date) return;
+    const totalDays = Math.max(1, Math.round(Number(b.autoTotalDays)) || 0);
+    const totalHours = Number(b.autoTotalHours) || 0;
+    if (totalDays < 1 || totalHours <= 0) return;
+
+    const breakMinutes = Number(b.break_minutes) || 0;
+    const netHoursPerDay = totalHours / totalDays;
+    const startTime = b.start_time || "09:00";
+    const endTime = minutesToTime(timeToMinutes(startTime) + netHoursPerDay * 60 + breakMinutes);
+    const endDate = addWorkingDaysExcluding(b.start_date, totalDays, workingWeekdays, holidays, blockedDates);
+
+    updateBatch(key, { start_time: startTime, end_time: endTime, end_date: endDate });
   }
 
   function updateBatch(key: string, patch: Partial<BatchDraft>) {
@@ -475,6 +540,46 @@ export function EngagementForm({
                       onChange={(e) => updateBatch(b.key, { timezone: e.target.value })}
                     />
                   </Field>
+                </div>
+
+                <div className="mt-4 rounded-lg border border-dashed border-slate-200 p-3">
+                  <div className="mb-3 text-xs font-medium text-slate-500">
+                    Auto-schedule from total hours &amp; days — fills in End Date and End
+                    Time from Start Date, skipping weekends, holidays, and days already
+                    booked elsewhere.
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <Field label="Total Days" htmlFor={`auto_days_${b.key}`}>
+                      <TextInput
+                        id={`auto_days_${b.key}`}
+                        type="number"
+                        min="1"
+                        value={b.autoTotalDays}
+                        onChange={(e) => updateBatch(b.key, { autoTotalDays: e.target.value })}
+                      />
+                    </Field>
+                    <Field label="Total Training Hours" htmlFor={`auto_hours_${b.key}`}>
+                      <TextInput
+                        id={`auto_hours_${b.key}`}
+                        type="number"
+                        min="0.5"
+                        step="0.5"
+                        value={b.autoTotalHours}
+                        onChange={(e) => updateBatch(b.key, { autoTotalHours: e.target.value })}
+                      />
+                    </Field>
+                    <div className="col-span-2 flex items-end sm:col-span-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => autoSchedule(b.key)}
+                        disabled={!b.start_date || !b.autoTotalDays || !b.autoTotalHours}
+                      >
+                        Fill End Date &amp; Time
+                      </Button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-4">

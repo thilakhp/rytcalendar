@@ -93,6 +93,33 @@ export function addWorkingDays(
   return format(last, "yyyy-MM-dd");
 }
 
+// Same walk-forward as addWorkingDays, but also skips any date present in
+// blockedDates (e.g. days already occupied by another commitment) — used by
+// the "auto-schedule from total hours/days" batch helper.
+export function addWorkingDaysExcluding(
+  startDate: string,
+  workingDaysToSpan: number,
+  workingWeekdays: number[],
+  holidays: HolidayLite[],
+  blockedDates: Set<string>,
+): string {
+  const holidayMap = holidayMapOf(holidays);
+  let cursor = parseISO(startDate);
+  let remaining = Math.max(1, workingDaysToSpan);
+  let last = cursor;
+  let safety = 3650;
+  while (remaining > 0 && safety > 0) {
+    const key = format(cursor, "yyyy-MM-dd");
+    if (isWorkingDate(cursor, workingWeekdays, holidayMap) && !blockedDates.has(key)) {
+      last = cursor;
+      remaining--;
+    }
+    if (remaining > 0) cursor = addDays(cursor, 1);
+    safety--;
+  }
+  return format(last, "yyyy-MM-dd");
+}
+
 function toMinutes(time: string): number {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;

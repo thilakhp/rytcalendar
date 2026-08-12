@@ -25,6 +25,7 @@ export default async function EditEngagementPage({
     { data: courses },
     { data: holidays },
     { data: settings },
+    { data: otherBatches },
   ] = await Promise.all([
     supabase.from("engagements").select("*").eq("id", id).maybeSingle(),
     supabase.from("batches").select("*").eq("engagement_id", id).order("start_date"),
@@ -34,11 +35,19 @@ export default async function EditEngagementPage({
     supabase.from("training_courses").select("*").eq("active", true).order("name"),
     supabase.from("holidays").select("date, is_working_day"),
     supabase.from("settings").select("*").eq("owner_id", user?.id ?? "").maybeSingle(),
+    supabase.from("batches").select("engagement_id, start_date, end_date, status"),
   ]);
 
   if (!engagement) notFound();
 
   const s = settings as Settings | null;
+  const defaultRules: Settings["availability_rules"] = {
+    planned: "tentative",
+    confirmed: "blocks",
+    in_progress: "blocks",
+    completed: "historical",
+    cancelled: "none",
+  };
 
   return (
     <>
@@ -60,6 +69,8 @@ export default async function EditEngagementPage({
         defaultBreakMinutes={s?.default_break_minutes ?? 0}
         statuses={s?.statuses ?? ["planned", "confirmed", "in_progress", "completed", "cancelled"]}
         deliveryModes={s?.delivery_modes ?? ["VILT", "Classroom", "Self-Paced", "Hybrid"]}
+        otherBatches={otherBatches ?? []}
+        availabilityRules={s?.availability_rules ?? defaultRules}
         onSubmit={updateEngagement.bind(null, id)}
         cancelHref={`/engagements/${id}`}
       />

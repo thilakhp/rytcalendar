@@ -184,20 +184,37 @@ export async function approveStagingRow(id: string, formData: FormData): Promise
   const { data: holidays } = await supabase.from("holidays").select("date, is_working_day");
   const workingWeekdays = s?.working_weekdays ?? [1, 2, 3, 4, 5];
 
-  const { data: engagement, error: engErr } = await supabase
+  // Reuse an existing engagement for the same client + vendor + program
+  // instead of creating a duplicate — the source calendar represents one
+  // multi-week program as several date-broken blocks of identical text.
+  let engagementId: string | null = null;
+  let existingQuery = supabase
     .from("engagements")
-    .insert({
-      owner_id: user.id,
-      client_id,
-      vendor_id: vendor_id || null,
-      program_name,
-      primary_timezone: s?.default_timezone ?? "Asia/Kolkata",
-      overall_status: status,
-      notes: "Migrated from Excel import.",
-    })
     .select("id")
-    .single();
-  if (engErr || !engagement) return { error: "Could not create the engagement." };
+    .eq("owner_id", user.id)
+    .eq("client_id", client_id)
+    .ilike("program_name", program_name);
+  existingQuery = vendor_id ? existingQuery.eq("vendor_id", vendor_id) : existingQuery.is("vendor_id", null);
+  const { data: existing } = await existingQuery.maybeSingle();
+  engagementId = existing?.id ?? null;
+
+  if (!engagementId) {
+    const { data: engagement, error: engErr } = await supabase
+      .from("engagements")
+      .insert({
+        owner_id: user.id,
+        client_id,
+        vendor_id: vendor_id || null,
+        program_name,
+        primary_timezone: s?.default_timezone ?? "Asia/Kolkata",
+        overall_status: status,
+        notes: "Migrated from Excel import.",
+      })
+      .select("id")
+      .single();
+    if (engErr || !engagement) return { error: "Could not create the engagement." };
+    engagementId = engagement.id;
+  }
 
   const calc = calcBatch(
     { start_date, end_date, start_time, end_time, break_minutes: 0 },
@@ -207,7 +224,7 @@ export async function approveStagingRow(id: string, formData: FormData): Promise
 
   const { error: batchErr } = await supabase.from("batches").insert({
     owner_id: user.id,
-    engagement_id: engagement.id,
+    engagement_id: engagementId,
     training_course_id: training_course_id || null,
     start_date,
     end_date,
@@ -223,13 +240,13 @@ export async function approveStagingRow(id: string, formData: FormData): Promise
     total_hours: calc.totalHours,
   });
   if (batchErr) {
-    await supabase.from("engagements").delete().eq("id", engagement.id);
+    if (!existing) await supabase.from("engagements").delete().eq("id", engagementId);
     return { error: "Could not create the batch." };
   }
 
   await supabase
     .from("import_staging")
-    .update({ review_status: "approved", linked_engagement_id: engagement.id })
+    .update({ review_status: "approved", linked_engagement_id: engagementId })
     .eq("id", id);
 
   revalidatePath("/settings/import");
