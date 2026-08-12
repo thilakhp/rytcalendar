@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AuthLayout({
   children,
 }: {
@@ -7,7 +9,14 @@ export default function AuthLayout({
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-block h-10 w-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-teal-500 shadow-sm" />
+          <Image
+            src="/ryt-logo.svg"
+            alt="RYT"
+            width={56}
+            height={56}
+            className="mx-auto mb-3"
+            priority
+          />
           <div className="text-2xl font-semibold tracking-tight text-slate-900">
             RYT
           </div>

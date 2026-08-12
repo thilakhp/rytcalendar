@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, LogOut, Search } from "lucide-react";
@@ -42,7 +43,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   return (
     <div className="flex items-center gap-2.5 px-6 py-6">
-      <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-brand-teal-500" />
+      <Image src="/ryt-logo.svg" alt="RYT" width={36} height={36} className="shrink-0" />
       <div>
         <div className="text-xl font-semibold tracking-tight text-slate-900">
           RYT
@@ -68,7 +69,7 @@ export function AppShell({
     <div className="min-h-screen bg-slate-50">
       <ConnectivityBanner />
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-slate-200 bg-white lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-slate-200 bg-white lg:flex">
         <Brand />
         <NavLinks />
         <div className="border-t border-slate-200 p-4">
@@ -97,7 +98,7 @@ export function AppShell({
           <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-white shadow-xl">
             <div className="flex items-center justify-between px-6 py-6">
               <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-brand-teal-500" />
+                <Image src="/ryt-logo.svg" alt="RYT" width={36} height={36} className="shrink-0" />
                 <div>
                   <div className="text-xl font-semibold tracking-tight text-slate-900">
                     RYT

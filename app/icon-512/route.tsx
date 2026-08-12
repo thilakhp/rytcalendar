@@ -1,8 +1,16 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import { ImageResponse } from "next/og";
 
 export const contentType = "image/png";
 
+function logoDataUri() {
+  const svg = readFileSync(join(process.cwd(), "public", "ryt-logo.svg"));
+  return `data:image/svg+xml;base64,${svg.toString("base64")}`;
+}
+
 export function GET() {
+  const logo = logoDataUri();
   return new ImageResponse(
     (
       <div
@@ -12,15 +20,11 @@ export function GET() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0f172a",
-          color: "#ffffff",
-          fontSize: 224,
-          fontWeight: 700,
-          letterSpacing: -8,
-          fontFamily: "sans-serif",
+          background: "#ffffff",
         }}
       >
-        RYT
+        {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) requires a raw <img>, not next/image */}
+        <img src={logo} width={380} height={380} alt="" />
       </div>
     ),
     { width: 512, height: 512 },
